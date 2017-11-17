@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>This is a page</title>
+<link href="" rel="stylesheet">
+</head>
+<script type="text/javascript">
+
+	function f(id) {
+		if (id=="email") {
+			document.getElementById("hint").innerHTML = ""
+		}else if (id=="password") {
+			document.getElementById("hint2").innerHTML = ""
+		}
+	}
+
+	function b(id) {
+		if (id=="email") {
+			email = document.getElementById("email").value
+			regix = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+			if (email=="") {
+				document.getElementById("hint").innerHTML = "邮箱地址不能为空"
+			}else if (!regix.test(email)) {
+				document.getElementById("hint").innerHTML = "请输入正确的邮箱"
+			}
+		}else if (id=="password") {
+			password = document.getElementById("password").value
+			if (password==""){
+				document.getElementById("hint2").innerHTML = " 密码不能为空"
+			}
+		}
+	}
+
+	function check() {
+
+		email = document.getElementById("email").value;
+		password = document.getElementById("password").value;
+		if (email=="") {
+			alert("邮箱不能为空")
+			return ;
+		}
+		if (password=="") {
+			alert("密码不能为空")
+			return ;
+		}
+
+
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				var status = xmlhttp.responseText;
+				if(status==1){
+					alert("密码或邮箱错误，登录失败")
+					return ;
+				}else{
+					userId = xmlhttp.responseText;
+					window.location.href='/success/?userId='+userId;
+				}
+			}
+		}
+		url = "/logcheck/?password="+password+"&email="+email;
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send();
+	}
+
+</script>
+<body>
+	<br><br><br>
+    <h1 style="text-align:center;margin:0 auto;"> Login to your account </h1> <br>
+
+    <table align="center" border="0">
+		<tr>
+			<td width="200px"></td>
+			<td width="200px"></td>
+			<td width="200px"></td>
+		</tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<p>
+				<input id="email" type="text" style="height: 30px;width: 300px;font-size: 20px" placeholder="Email address" name="email" width="400px" height="60px" onblur="b(this.id)" onfocus="f(this.id)" /></p>
+			</td>
+			<td>
+				<span id="hint"></span>
+			</td>
+
+		</tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<input id="password" type="password" style="height: 30px;width: 300px;font-size: 20px" placeholder="Password" name="password" width="400px" height="60px" onblur="b(this.id)" onfocus="f(this.id)" />
+			</td>
+			<td>
+				<span id="hint2">&nbsp;</span>
+			</td>
+
+		</tr>
+	</table>
+	<div  align="center">
+	    <br><br>
+	    <button onclick="check()" style="height: 30px;width: 150px"> Login </button>
+	    <br><br>
+	    Don't have an account? <a href="/register/"><b>Sign Up</b></a>
+	</div>
+</body>
+</html>

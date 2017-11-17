@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>register</title>
+<style type="text/css">
+.code 
+{
+ background:url(http://otcislz5j.bkt.clouddn.com/bg.jpg);
+ font-family:Arial;
+ font-style:italic;
+ color:red;
+ font-size:30px;
+ border:0;
+ padding:2px 3px;
+ letter-spacing:3px;
+ font-weight:bolder;
+ float:left;
+ cursor:pointer;
+ width:150px;
+ height:60px;
+ line-height:60px;
+ text-align:center;
+ vertical-align:middle;
+}
+a 
+{
+ text-decoration:none;
+ font-size:12px;
+ color:#288bc4;
+}
+a:hover 
+{
+ text-decoration:underline;
+}
+</style>
+
+<script type="text/javascript">
+
+	var code;
+	function createCode() {
+		 code = "";
+		 var codeLength = 6; //验证码的长度
+		 var checkCode = document.getElementById("checkCode");
+		 var codeChars = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+		      'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+		      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'); //所有候选组成验证码的字符，当然也可以用中文的
+		 for(var i = 0; i < codeLength; i++) {
+			  var charNum = Math.floor(Math.random() * 52);
+			  code += codeChars[charNum];
+		 }
+		 if(checkCode) {
+			  checkCode.className = "code";
+			  checkCode.innerHTML = code;
+		 }
+	}
+
+	function re(){
+		document.getElementById("username").value = "";
+		document.getElementById("email").value = "";
+		document.getElementById("password").value = "";
+		document.getElementById("hint2").innerHTML = ""
+		document.getElementById("hint3").innerHTML = ""
+		document.getElementById("hint").innerHTML = ""
+	}
+
+	function b(id){
+		if (id=="username") {
+			username = document.getElementById("username").value;
+			if (username=="") {
+				document.getElementById("hint").innerHTML = "&nbsp;&nbsp;用户名不能为空"
+			}else{
+				xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange=function()
+				{
+					if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+						var status = xmlhttp.responseText;
+						if(status==2){
+							document.getElementById("hint").innerHTML = "&nbsp;&nbsp;用户名已被使用"
+							return ;
+						}
+					}
+				}
+				url = "/check_name/?userName="+username;
+				xmlhttp.open("GET",url,true);
+				xmlhttp.send();
+			}
+		}else if (id=="email") {
+			email = document.getElementById("email").value
+			regix = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+			if (email=="") {
+				document.getElementById("hint2").innerHTML = "&nbsp;&nbsp;邮箱地址不能为空"
+			}else if (!regix.test(email)) {
+				document.getElementById("hint2").innerHTML = "&nbsp;&nbsp;请输入正确的邮箱地址"
+			}else{
+				xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange=function()
+				{
+					if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+						var status = xmlhttp.responseText;
+						if(status==2){
+							document.getElementById("hint2").innerHTML = "&nbsp;&nbsp;邮箱已被使用"
+							return ;
+						}
+					}
+				}
+				url = "/check_email/?email="+email;
+				xmlhttp.open("GET",url,true);
+				xmlhttp.send();
+			}
+		}else if (id=="password") {
+			password = document.getElementById("password").value
+			if (password.length<6){
+				document.getElementById("hint3").innerHTML = "&nbsp;&nbsp;请输入至少六位数的密码"
+			}
+		}
+	}
+
+	function fo(id) {
+		if (id=="email") {
+			document.getElementById("hint2").innerHTML = ""
+		}else if (id=="password") {
+			document.getElementById("hint3").innerHTML = ""
+		}else if (id=="username") {
+			document.getElementById("hint").innerHTML = ""
+		}
+	}
+
+	function f()
+	{
+		
+		password = document.getElementById("password").value;
+		if (password.length<6){
+			alert("请输入至少六位数的密码")
+			return ;
+		}
+		inputCode=document.getElementById("code").value;
+		if(inputCode.length <= 0) {
+			alert("请输入验证码！");
+			return ;
+		}
+		else if(inputCode.toUpperCase() != code.toUpperCase()){
+		 	alert("验证码输入有误！");
+			createCode();
+			return ;
+		}  
+
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				var status = xmlhttp.responseText;
+				if(status==1){
+					alert("注册成功")
+					window.location.href='/index/';
+					return ;
+				}
+				alert("用户名或邮箱已存在，注册失败")
+			}
+		}
+		url = "/regcheck/?userName="+username+"&password="+password+"&email="+email;
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send();
+	}
+</script>
+</head>
+<body onload="createCode()">
+	<div align="center"><h1 align="center"> Create an account </h1></div>
+	<table align="center" border="0">
+		<tr>
+			<td width="200px"></td>
+			<td width="200px"></td>
+			<td width="200px"></td>
+		</tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<p>
+				<input align="center" type="text" style="height: 30px;width: 300px;font-size: 20px" placeholder="Username" id="username" width="400px" height="60px" onblur="b(this.id)" onfocus="fo(this.id)" /></p>
+			</td>
+			<td>
+				<span id="hint"></span>
+			</td>
+
+		</tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<input align="center" type="email" style="height: 30px;width: 300px;font-size: 20px" placeholder="Email address" id="email" width="400px" height="60px" onblur="b(this.id)" onfocus="fo(this.id)"/>
+			</td>
+			<td>
+				<span id="hint2">&nbsp;</span>
+			</td>
+
+		</tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<p>
+				<input align="center" type="password" style="height: 30px;width: 300px;font-size: 20px" placeholder="Password" id="password" width="400px" height="60px" onblur="b(this.id)" onfocus="fo(this.id)"/></p>
+			</td>
+			<td>
+				<span id="hint3">&nbsp;</span>
+			</td>
+
+		</tr>
+		<tr>
+			<td width="200px"> <span style="float: right;"></span></td>
+			<td>
+				<input align="center" type="text" style="height: 30px;width: 300px;font-size: 20px" placeholder="Type in Verification code" id="code" width="400px" height="60px" onblur="b(this.id)" onfocus="fo(this.id)"/>
+			</td>
+			<td>
+				<div class="code" id="checkCode" onclick="createCode()" ></div>
+			</td>
+
+		</tr>
+		<tr>
+		    <td width="200px"></td>
+			<td width="200px"></td>
+		    <td><a href="#" onclick="createCode()">看不清换一张</a></td>
+	    </tr>
+		<tr>
+			<td width="200px"></td>
+			<td>
+				<br>
+				<button onclick="f()" style="height: 30px;width: 100px;float: left;"> OK </button>
+				<button onclick="re()" style="height: 30px;width: 100px; float: right;"> RESET </button>
+			</td>
+			<td>
+				&nbsp;
+			</td>
+
+		</tr>
+	</table>
+	    <br><br>
+	    <div align="center"><a href="/index/">Back</a></div>
+</body>
+</html>
